@@ -1,25 +1,42 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:project1/repository/screens/home/homescreen.dart';
+ // Ensure this file contains HomeScreen
 
-class VerificationCompletedScreen extends StatelessWidget {
+class VerificationCompletedScreen extends StatefulWidget {
   const VerificationCompletedScreen({super.key});
+
+  @override
+  _VerificationCompletedScreenState createState() => _VerificationCompletedScreenState();
+}
+
+class _VerificationCompletedScreenState extends State<VerificationCompletedScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Navigate to HomeScreen after 2 seconds
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Optional: If you want to remove the AppBar space, use extendBodyBehindAppBar
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Check Icon
-              Icon(
+              const Icon(
                 Icons.check_circle,
                 size: 80,
-                color: Colors.black, // Adjust color to your preference
+                color: Colors.black,
               ),
               const SizedBox(height: 20),
-              // Verification Completed Text
               const Text(
                 "Verification Completed",
                 style: TextStyle(
@@ -33,4 +50,11 @@ class VerificationCompletedScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: VerificationCompletedScreen(),
+  ));
 }
