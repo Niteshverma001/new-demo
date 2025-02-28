@@ -1,33 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:project1/repository/screens/schedules/schedulescreen.dart';
 
-class QuickServiceScreen extends StatelessWidget {
+class QuickServiceScreen extends StatefulWidget {
   const QuickServiceScreen({super.key});
+
+  @override
+  State<QuickServiceScreen> createState() => _QuickServiceScreenState();
+}
+
+class _QuickServiceScreenState extends State<QuickServiceScreen> {
+  final List<String> services = ["Wash & Iron", "Dry Clean"];
+  final List<String> selectedServices = List.generate(13, (index) => "Wash & Iron");
+  final List<int> quantities = List.generate(13, (index) => 0);
+  int selectedItemCount = 0;
+
+  void _updateSelection(int index, String? value) {
+    if (value != null) {
+      setState(() {
+        selectedServices[index] = value;
+      });
+    }
+  }
+
+  void _increaseQuantity(int index) {
+    setState(() {
+      quantities[index]++;
+      selectedItemCount = quantities.reduce((a, b) => a + b);
+    });
+  }
+
+  void _decreaseQuantity(int index) {
+    setState(() {
+      if (quantities[index] > 0) {
+        quantities[index]--;
+        selectedItemCount = quantities.reduce((a, b) => a + b);
+      }
+    });
+  }
+
+  void _navigateToScheduleScreen() {
+    if (selectedItemCount > 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SchedulePickupScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Select Service"),
-        backgroundColor: Colors.transparent, // Removed background color
-        elevation: 0, // Removes shadow for a cleaner look
-        iconTheme: const IconThemeData(color: Colors.black), // Ensures icons are visible
-        titleTextStyle: const TextStyle(
-          color: Colors.black, // Ensures title text is visible
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () {},
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (selectedItemCount > 0)
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "$selectedItemCount Item${selectedItemCount > 1 ? 's' : ''} Added to your Basket",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.shopping_cart),
+                      label: const Text("View Basket"),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 10),
             const Text(
               "Quick Services",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -60,25 +120,34 @@ class QuickServiceScreen extends StatelessWidget {
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 DropdownButton<String>(
-                                  value: "Wash & Iron",
-                                  items: ["Wash & Iron", "Dry Clean"]
-                                      .map((e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e),
-                                  ))
-                                      .toList(),
-                                  onChanged: (value) {},
+                                  value: selectedServices[index],
+                                  items: services.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                  onChanged: (value) => _updateSelection(index, value),
                                 ),
-                                const Text(
-                                  "₹18",
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
+                                const Text("₹18", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {},
+                          quantities[index] == 0
+                              ? ElevatedButton(
+                            onPressed: () => _increaseQuantity(index),
                             child: const Text("Add"),
+                          )
+                              : Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => _decreaseQuantity(index),
+                                icon: const Icon(Icons.remove, color: Colors.black),
+                              ),
+                              Text(
+                                "${quantities[index]}",
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                onPressed: () => _increaseQuantity(index),
+                                icon: const Icon(Icons.add, color: Colors.black),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -88,9 +157,9 @@ class QuickServiceScreen extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: selectedItemCount > 0 ? _navigateToScheduleScreen : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
+                backgroundColor: selectedItemCount > 0 ? Colors.black : Colors.grey,
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text("Continue"),
@@ -109,7 +178,6 @@ class QuickServiceScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.update), label: "Updates"),
         ],
       ),
-
     );
   }
 }
